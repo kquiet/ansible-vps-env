@@ -1,0 +1,12 @@
+---
+- hosts: all
+  vars:
+    all_ip_list: "{{ansible_play_hosts_all|map('extract', hostvars, ['ansible_host'])|list}}"
+    all_host_ip_dic: "{{dict(ansible_play_hosts_all|zip(ansible_play_hosts_all|map('extract', hostvars, ['ansible_host'])|list))}}"
+  roles:
+  - role: common
+    become: true
+  - role: docker
+    become: true
+    vars:
+      docker_users: ["monkey"]

@@ -1,0 +1,16 @@
+all:
+  children:
+    vagrantnodes:
+      hosts:
+        sun:
+          ansible_host: 192.168.56.11
+          ansible_port: 22
+          ansible_python_interpreter: /usr/bin/python
+        earth:
+          ansible_host: 192.168.56.12
+          ansible_port: 22
+          ansible_python_interpreter: /usr/bin/python
+        venus:
+          ansible_host: 192.168.56.13
+          ansible_port: 22
+          ansible_python_interpreter: /usr/bin/python

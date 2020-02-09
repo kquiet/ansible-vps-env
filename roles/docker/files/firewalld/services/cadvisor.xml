@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>cadvisor</short>
+  <description>https://github.com/google/cadvisor</description>
+  <port protocol="tcp" port="42282"/>
+</service>

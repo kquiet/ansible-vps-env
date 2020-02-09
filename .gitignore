@@ -1,0 +1,20 @@
+# Log file
+*.log
+
+# ide related
+nbproject/
+nbactions.xml
+nb-configuration.xml
+.classpath
+.project
+.settings/
+.vscode/
+
+# temp file of markdown
+*.md.html
+
+# local test files
+test*.yml
+
+# local password files
+pwd*

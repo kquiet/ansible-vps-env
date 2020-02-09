@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>node exporter</short>
+  <description>https://github.com/prometheus/node_exporter</description>
+  <port protocol="tcp" port="9100"/>
+</service>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<direct>
+  <rule priority="0" table="filter" ipv="ipv4" chain="IN_public_allow">-i docker_gwbridge -p tcp -m tcp --dport 42282 -m conntrack --ctstate NEW -j ACCEPT</rule>
+  <rule priority="0" table="filter" ipv="ipv4" chain="IN_public_allow">-i docker_gwbridge -p tcp -m tcp --dport 9100 -m conntrack --ctstate NEW -j ACCEPT</rule>
+</direct>

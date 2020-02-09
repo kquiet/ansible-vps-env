@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>dockerswarm</short>
+  <description>https://docs.docker.com/engine/swarm/swarm-tutorial/#open-protocols-and-ports-between-the-hosts</description>
+
+  <!-- for cluster management communications -->
+  <port protocol="tcp" port="2377"/>
+
+  <!-- for communication among nodes -->
+  <port protocol="tcp" port="7946"/>
+  <port protocol="udp" port="7946"/>
+
+  <!-- for overlay network traffic -->
+  <port protocol="udp" port="4789"/>
+</service>

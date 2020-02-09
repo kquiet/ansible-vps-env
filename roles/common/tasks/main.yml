@@ -1,0 +1,104 @@
+---
+- name: install required repositories
+  yum:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - epel-release
+    - centos-release
+    - centos-release-scl
+    - centos-release-scl-rh
+- name: install required packages
+  yum:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - ansible
+    - bash
+    - bash-completion
+    - ca-certificates
+    - coreutils
+    - curl
+    - fail2ban
+    - findutils
+    - firewalld
+    - gnupg2
+    - gnutls
+    - grep
+    - gzip
+    - iputils
+    - java-1.8.0-openjdk
+    - less
+    - libselinux-python
+    - libsemanage-python
+    - lsof
+    - man-db
+    - net-tools
+    - nmap-ncat
+    - ntp
+    - openssh-clients
+    - openssh-server
+    - openssl
+    - passwd
+    - pinentry
+    - python
+    - python-devel
+    - python-pip
+    - python-setuptools
+    - python-virtualenv
+    - rpm
+    - rpmconf
+    - rsync
+    - rsyslog
+    - scl-utils
+    - sed
+    - setools-console
+    - setroubleshoot
+    - socat
+    - sudo
+    - tar
+    - time
+    - tzdata
+    - unzip
+    - vim-minimal
+    - wget
+    - which
+    - whois
+    - yum
+    - yum-utils
+- name: start required services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+  - fail2ban
+  - firewalld
+  - ntpd
+  - rsyslog
+- name: setup ntp config
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart ntpd
+- name: setup fail2ban config
+  copy:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart fail2ban
+- name: setup sshd config
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    mode: "0600"
+  notify: restart sshd
+- name: force all common notified handlers to run at this point
+  meta: flush_handlers

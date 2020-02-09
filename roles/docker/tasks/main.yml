@@ -1,0 +1,57 @@
+---
+- name: remove old versions of docker
+  yum:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - docker
+    - docker-client
+    - docker-client-latest
+    - docker-common
+    - docker-latest
+    - docker-latest-logrotate
+    - docker-logrotate
+    - docker-engine
+- name: install required packages
+  yum:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+- name: add docker-ce repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    owner: "root"
+    group: "root"
+    mode: "0644"
+- name: install latest docker
+  yum:
+    name: [docker-ce, docker-ce-cli, containerd.io]
+    state: latest
+- name: start docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+- name: add user to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_users }}"
+- name: pip install docker library
+  pip:
+    name:
+    - setuptools>=44,<45
+    - wheel>0.34
+    - jsondiff>=1.2
+    - pyyaml>=3.11
+    - docker>=4.1
+ 
+- import_tasks: docker-compose.yml
+- import_tasks: docker-swarm.yml

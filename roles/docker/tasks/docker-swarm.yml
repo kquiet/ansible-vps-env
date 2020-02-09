@@ -1,0 +1,42 @@
+---
+- name: setup firewalld config(direct and services)
+  copy:
+    src: firewalld/
+    dest: /etc/firewalld/
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart firewalld
+- name: setup firewalld config(zones)
+  template:
+    src: firewalld_zone_public.xml.j2
+    dest: /etc/firewalld/zones/public.xml
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  vars:
+    peer_server_ips: "{{ansible_play_hosts_all|map('extract', hostvars, ['ansible_host'])|list}}"
+  notify: restart firewalld
+- name: force all firewalld notified handlers to run at this point
+  meta: flush_handlers
+
+# Use the first host as the seed host to init a docker swarm cluster.
+# Any other inactive node joins as a manager.
+- name: check if already in docker swarm cluster
+  shell: docker info --format '{% raw %}{{ .Swarm.LocalNodeState }}{% endraw %}'
+  changed_when: false
+  when: inventory_hostname != ansible_play_hosts_all[0]
+  register: already_in_swarm
+- name: init docker swarm cluster
+  docker_swarm:
+    state: present
+    advertise_addr: "{{ansible_host}}"
+  register: swarm_info
+  when: inventory_hostname == ansible_play_hosts_all[0]
+- name: add node to docker swarm cluster
+  docker_swarm:
+    state: join
+    advertise_addr: "{{ansible_host}}"
+    join_token: "{{hostvars[ansible_play_hosts_all[0]]['swarm_info']['swarm_facts']['JoinTokens']['Manager']}}"
+    remote_addrs: "{{hostvars[ansible_play_hosts_all[0]]['ansible_host']}}:2377"
+  when: inventory_hostname != ansible_play_hosts_all[0] and already_in_swarm['stdout']== "inactive"

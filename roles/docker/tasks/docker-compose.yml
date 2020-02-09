@@ -1,0 +1,35 @@
+---
+- name: check current version of docker-compose
+  shell: /usr/local/bin/docker-compose --version
+  register: docker_compose_current_version
+  changed_when: false
+  failed_when: false
+- debug:
+    msg: "{{docker_compose_current_version}}"
+- name: delete current version of docker-compose if different with the expected
+  block:
+  - name: delete docker-compose
+    file:
+      path: "/usr/local/bin/docker-compose"
+      state: absent
+  - name: delete docker-compose completion script
+    file:
+      path: "/etc/bash_completion.d/docker-compose"
+      state: absent
+  when: >
+    docker_compose_current_version.stdout is defined
+    and docker_compose_version not in docker_compose_current_version.stdout
+- name: install docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: "/usr/local/bin/docker-compose"
+    mode: "0755"
+- name: install docker-compose completion script
+  get_url:
+    url: "https://raw.githubusercontent.com/docker/compose/{{ docker_compose_version }}/contrib/completion/bash/docker-compose"
+    dest: "/etc/bash_completion.d/docker-compose"
+    mode: "0644"
+- name: pip install docker-compose library
+  pip:
+    name:
+    - "docker-compose>={{ docker_compose_version }}"
